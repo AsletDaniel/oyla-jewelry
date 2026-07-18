@@ -1,0 +1,9 @@
+.DS_Store
+
+# derivados pesados que el sitio ya no usa (se sirven los -hd.jpg)
+assets/*.png
+assets/hero.jpg
+assets/hero-end.jpg
+assets/intro-still.jpg
+assets/macro.jpg
+assets/product.jpg

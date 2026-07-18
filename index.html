@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>OYLA — Pure Form · SS/01</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230A0A0A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-state="loading">
+
+<!-- ============ LOADER ============ -->
+<div id="loader" aria-hidden="true">
+  <div class="loader-mark">
+    <span class="ghost">OYLA</span>
+    <span class="fill" id="loader-fill">OYLA</span>
+  </div>
+  <div class="loader-meta">
+    <span class="loader-note">LOADING — SS/01 COLLECTION</span>
+    <span class="loader-pct"><b id="loader-pct">00</b> %</span>
+  </div>
+</div>
+
+<!-- ============ MEDIA STACK ============ -->
+<div id="media">
+  <img  id="still-hero"    class="media-layer" decoding="async" alt="">
+  <img  id="still-macro"   class="media-layer" decoding="async" alt="">
+  <img  id="still-product" class="media-layer" decoding="async" alt="">
+  <video id="v1" class="media-layer" muted playsinline preload="auto" disableremoteplayback></video>
+  <video id="v2" class="media-layer" muted playsinline preload="auto" disableremoteplayback></video>
+  <video id="v3" class="media-layer" muted playsinline preload="auto" disableremoteplayback></video>
+</div>
+
+<div id="vprogress"></div>
+
+<!-- ============ PERSISTENT CHROME ============ -->
+<header id="chrome">
+  <div class="brand ui-el" style="--d:0s">
+    <div class="brand-row">
+      <span class="brand-name" aria-label="OYLA"><b style="--i:0">O</b><b style="--i:1">Y</b><b style="--i:2">L</b><b style="--i:3">A</b></span>
+      <span class="brand-tag">JEWELRY<br>FOR&nbsp;THE<br>ESSENTIAL</span>
+    </div>
+    <div class="brand-bar"><span style="--d:.12s"></span><i style="--d:.32s"></i></div>
+  </div>
+
+  <div class="corner-tr ui-el" style="--d:.06s">
+    <div class="ss">
+      <span class="ss-bar" style="--d:.16s"></span>
+      <b>SS&nbsp;/&nbsp;01</b>
+      <span class="ss-sub">NEW COLLECTION</span>
+    </div>
+    <div class="plus">+</div>
+  </div>
+
+  <div class="ticker ui-el" style="--d:.14s" aria-hidden="true">
+    <div class="ticker-track"><span id="tk-a"></span><span id="tk-b"></span></div>
+  </div>
+
+  <div class="rail-right ui-el" style="--d:.18s">
+    <span class="scan"><i class="scan-track"></i><i class="scan-block"></i></span>
+    <span class="rail-text">DETAILS&nbsp;MATTER</span>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section id="ui-hero">
+  <h1 class="display" aria-label="Pure Form">
+    <span class="line"><span class="lw" style="--lb:0s"><b style="--i:0">P</b><b style="--i:1">U</b><b style="--i:2">R</b><b style="--i:3">E</b></span></span>
+    <span class="line"><span class="lw" style="--lb:.1s"><b style="--i:0">F</b><b style="--i:1">O</b><b style="--i:2">R</b><b style="--i:3">M</b></span></span>
+  </h1>
+  <div class="hero-cta">
+    <div class="box tag-box sweep" style="--d:.2s">
+      <span>SCULPTURAL PIECES.<br>TIMELESS CLARITY.</span>
+      <em class="cell" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6 18 18 6M8.5 6H18v9.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+      </em>
+    </div>
+    <button class="box btn sweep" id="btn-discover" style="--d:.28s">
+      <span>DISCOVER COLLECTION</span>
+      <em class="cell" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 12h15M13 5.5 19.5 12 13 18.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+      </em>
+    </button>
+  </div>
+</section>
+
+<!-- ============ AVAILABILITY INDICATOR ============ -->
+<button id="indicator" aria-label="The only available piece — inspect">
+  <span class="ind-core">
+    <i></i><u class="ring r1"></u><u class="ring r2"></u>
+  </span>
+  <span class="ind-line"></span>
+  <span class="ind-label">
+    <b>AVAILABLE — 01&nbsp;/&nbsp;01</b>
+    <span>THE ONLY PIECE&nbsp;&nbsp;·&nbsp;&nbsp;CLICK TO INSPECT</span>
+  </span>
+</button>
+
+<!-- ============ MACRO ============ -->
+<section id="ui-macro">
+  <div class="callout ui-el" id="co-stone" style="--d:.05s">
+    <span class="co-core"></span><span class="co-line"></span>
+    <span class="co-label"><b>STONE</b><span>ROUND FACETED — CLEAR</span></span>
+  </div>
+  <div class="callout ui-el" id="co-material" style="--d:.15s">
+    <span class="co-core"></span><span class="co-line"></span>
+    <span class="co-label"><b>MATERIAL</b><span>STERLING SILVER · 925</span></span>
+  </div>
+  <div class="callout ui-el" id="co-finish" style="--d:.25s">
+    <span class="co-core"></span><span class="co-line"></span>
+    <span class="co-label"><b>FINISH</b><span>HIGH POLISH</span></span>
+  </div>
+  <button class="box btn cap-cta sweep" id="btn-open" style="--d:.32s">
+    <span>OPEN THE PIECE</span>
+    <em class="cell" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 12h15M13 5.5 19.5 12 13 18.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+    </em>
+  </button>
+</section>
+
+<!-- ============ PRODUCT ============ -->
+<section id="ui-product">
+  <h2 class="display-sm" aria-label="Pure Form">
+    <span class="line"><span class="lw" style="--lb:0s"><b style="--i:0">P</b><b style="--i:1">U</b><b style="--i:2">R</b><b style="--i:3">E</b></span></span>
+    <span class="line"><span class="lw" style="--lb:.08s"><b style="--i:0">F</b><b style="--i:1">O</b><b style="--i:2">R</b><b style="--i:3">M</b></span></span>
+  </h2>
+
+  <div class="box tag-box sweep" style="--d:.14s">
+    <span>SCULPTURAL STATEMENT RING</span>
+    <em class="cell" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M6 18 18 6M8.5 6H18v9.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+    </em>
+  </div>
+
+  <div class="edition ui-el" style="--d:.22s">
+    <span class="ed-dot"></span>EDITION 1&nbsp;/&nbsp;1&nbsp;&nbsp;—&nbsp;&nbsp;AVAILABLE NOW
+  </div>
+
+  <ul class="specs">
+    <li class="ui-el" style="--d:.28s">
+      <button class="spec-head" aria-expanded="false">
+        <i></i><b>STERLING SILVER · 925</b><em>+</em>
+      </button>
+      <div class="spec-body"><p>Solid cast in one pour. No plating, no hollow shell — weight you can feel.</p></div>
+    </li>
+    <li class="ui-el" style="--d:.34s">
+      <button class="spec-head" aria-expanded="false">
+        <i></i><b>ROUND FACETED CLEAR STONE</b><em>+</em>
+      </button>
+      <div class="spec-body"><p>Bezel-set crystal, cut deep to hold hard light from every angle.</p></div>
+    </li>
+    <li class="ui-el" style="--d:.4s">
+      <button class="spec-head" aria-expanded="false">
+        <i></i><b>HIGH POLISH FINISH</b><em>+</em>
+      </button>
+      <div class="spec-body"><p>Mirror-buffed by hand to a liquid, glass-white shine.</p></div>
+    </li>
+    <li class="ui-el" style="--d:.46s">
+      <button class="spec-head" aria-expanded="false">
+        <i></i><b>MODERN SCULPTURAL DESIGN</b><em>+</em>
+      </button>
+      <div class="spec-body"><p>One continuous volume — the O of OYLA, cast in metal.</p></div>
+    </li>
+  </ul>
+
+  <button class="box btn sweep" id="btn-details" style="--d:.54s">
+    <span>DISCOVER DETAILS</span>
+    <em class="cell" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 12h15M13 5.5 19.5 12 13 18.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+    </em>
+  </button>
+
+  <button id="btn-back" class="ui-el" style="--d:.62s">←&nbsp;&nbsp;BACK TO CAMPAIGN</button>
+</section>
+
+<!-- ============ SKIP ============ -->
+<button id="skip">SKIP INTRO —</button>
+
+<!-- ============ CURSOR ============ -->
+<div id="cursor" aria-hidden="true"></div>
+<div id="cursor-label" aria-hidden="true"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
