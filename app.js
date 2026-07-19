@@ -105,16 +105,11 @@ function playVideo(video, rate, onEnded) {
 }
 
 /* ---------------- preload ---------------- */
-/* The intro video streams natively and starts as soon as the
-   browser has enough data; everything else prefetches behind it.
-   Every wait has a hard timeout — the loader can never get stuck. */
-
-const PREFETCH = [
-  { el: v2, url: "assets/video2.mp4" },
-  { el: v3, url: "assets/video3.mp4" },
-  { el: stills.macro, url: "assets/macro-hd.jpg", img: true },
-  { el: stills.product, url: "assets/product-hd.jpg", img: true },
-];
+/* Videos load via fetch→blob: some Chrome profiles stall the media
+   element's own streaming (range requests) while plain fetch flows
+   fine, and blob playback bypasses that stack entirely. Streaming
+   stays as fallback, and every wait has a hard timeout — the loader
+   can never get stuck. */
 
 const pctEl = $("#loader-pct");
 const fillEl = $("#loader-fill");
@@ -124,15 +119,7 @@ function paintProgress(p) {
   fillEl.style.clipPath = "inset(0 " + (100 - p * 100) + "% 0 0)";
 }
 
-async function fetchAsset({ el, url, img }) {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(res.status);
-    el.src = URL.createObjectURL(await res.blob());
-  } catch {
-    el.src = url; // let the browser stream it on demand
-  }
-}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* Resolves on ready, error, or timeout — never hangs. */
 function waitFor(el, img, ms) {
@@ -147,30 +134,52 @@ function waitFor(el, img, ms) {
   });
 }
 
+async function fetchImage(el, url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status);
+    el.src = URL.createObjectURL(await res.blob());
+  } catch {
+    el.src = url;
+  }
+}
+
+async function fetchVideoBlob(el, url, totalBytes, report) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status);
+    const reader = res.body.getReader();
+    const chunks = [];
+    let got = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      got += value.byteLength;
+      if (report && totalBytes) paintProgress(Math.min(1, got / totalBytes));
+    }
+    el.src = URL.createObjectURL(new Blob(chunks, { type: "video/mp4" }));
+    await waitFor(el, false, 3000);
+  } catch {
+    el.src = url; // last resort: let the media stack try streaming
+  }
+}
+
 async function boot() {
   stills.hero.src = "assets/hero-hd.jpg";
-  v1.src = "assets/video1.mp4";
-  v1.load();
-
-  /* real buffering progress from the streaming video */
-  (function paintLoop() {
-    if (state !== "loading") return;
-    let p = 0;
-    try {
-      const d = v1.duration, b = v1.buffered;
-      if (d && b.length) p = Math.min(1, b.end(b.length - 1) / d);
-    } catch { /* buffered can be briefly unreadable */ }
-    paintProgress(p);
-    requestAnimationFrame(paintLoop);
-  })();
-
-  await Promise.all([
-    waitFor(v1, false, 8000),
-    waitFor(stills.hero, true, 4000),
+  /* intro video gates the start, but never for more than ~9s */
+  await Promise.race([
+    fetchVideoBlob(v1, "assets/video1.mp4", 4115730, true),
+    sleep(9000),
   ]);
+  await waitFor(stills.hero, true, 3000);
   paintProgress(1);
   startIntro();
-  PREFETCH.forEach(fetchAsset);
+  /* the rest prefetches behind the intro */
+  fetchVideoBlob(v2, "assets/video2.mp4");
+  fetchVideoBlob(v3, "assets/video3.mp4");
+  fetchImage(stills.macro, "assets/macro-hd.jpg");
+  fetchImage(stills.product, "assets/product-hd.jpg");
 }
 
 /* ---------------- flow ---------------- */
