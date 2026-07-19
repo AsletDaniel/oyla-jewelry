@@ -41,7 +41,7 @@ const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let state = "loading";
 let lastChange = 0;
 
-const chrome = $("#chrome");
+const hud = $("#chrome"); /* "chrome" choca con el global de Chrome */
 const uiHero = $("#ui-hero"), uiMacro = $("#ui-macro"), uiProduct = $("#ui-product");
 
 /* User-initiated transitions must not re-fire on double-dispatched
@@ -58,7 +58,7 @@ function setState(next) {
 
   if (next === "macro") placeCallouts();
 
-  chrome.classList.toggle("show", next === "hero" || next === "product");
+  hud.classList.toggle("show", next === "hero" || next === "product");
   uiHero.classList.toggle("show", next === "hero");
   uiMacro.classList.toggle("show", next === "macro");
   uiProduct.classList.toggle("show", next === "product");
