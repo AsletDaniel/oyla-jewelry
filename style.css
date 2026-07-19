@@ -55,7 +55,8 @@ body[data-state="product"] #media{
   object-fit:cover; object-position:50% 50%;
   opacity:0;
   transition:opacity .4s linear;
-  will-change:opacity;
+  /* sin will-change: la promoción a GPU pinta en blanco en Chromes
+     con el proceso GPU dañado */
 }
 .media-layer.on{ opacity:1; transition:none; }
 

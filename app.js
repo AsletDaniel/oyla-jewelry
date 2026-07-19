@@ -96,12 +96,21 @@ function trackProgress(video) {
 }
 
 function playVideo(video, rate, onEnded) {
+  let finished = false;
+  const finish = () => { if (finished) return; finished = true; onEnded(); };
   video.currentTime = 0;
   video.playbackRate = rate;
   trackProgress(video);
-  video.onended = onEnded;
+  video.onended = finish;
   const p = video.play();
-  if (p) p.catch(() => onEnded());
+  if (p) p.catch(finish);
+  /* if decode never starts (broken media pipeline), skip the cinematic
+     and land on the hi-res still instead */
+  setTimeout(() => {
+    if (video.currentTime < 0.05) { video.pause(); finish(); }
+  }, 2500);
+  /* absolute cap in case playback stalls mid-way */
+  setTimeout(finish, 6000);
 }
 
 /* ---------------- preload ---------------- */
