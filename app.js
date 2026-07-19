@@ -105,65 +105,72 @@ function playVideo(video, rate, onEnded) {
 }
 
 /* ---------------- preload ---------------- */
-/* Critical assets gate the intro; the rest stream in behind it. */
+/* The intro video streams natively and starts as soon as the
+   browser has enough data; everything else prefetches behind it.
+   Every wait has a hard timeout — the loader can never get stuck. */
 
-const ASSETS = [
-  { el: v1, url: "assets/video1.mp4", bytes: 4115730, critical: true },
-  { el: stills.hero, url: "assets/hero-hd.jpg", bytes: 235578, img: true, critical: true },
-  { el: v2, url: "assets/video2.mp4", bytes: 3546297 },
-  { el: v3, url: "assets/video3.mp4", bytes: 4076175 },
-  { el: stills.macro, url: "assets/macro-hd.jpg", bytes: 280036, img: true },
-  { el: stills.product, url: "assets/product-hd.jpg", bytes: 175892, img: true },
+const PREFETCH = [
+  { el: v2, url: "assets/video2.mp4" },
+  { el: v3, url: "assets/video3.mp4" },
+  { el: stills.macro, url: "assets/macro-hd.jpg", img: true },
+  { el: stills.product, url: "assets/product-hd.jpg", img: true },
 ];
-const CRITICAL_BYTES = ASSETS.filter(a => a.critical)
-  .reduce((a, x) => a + x.bytes, 0);
 
 const pctEl = $("#loader-pct");
 const fillEl = $("#loader-fill");
-let criticalLoaded = 0;
 
-function paintProgress() {
-  const p = Math.min(1, criticalLoaded / CRITICAL_BYTES);
+function paintProgress(p) {
   pctEl.textContent = String(Math.floor(p * 100)).padStart(2, "0");
   fillEl.style.clipPath = "inset(0 " + (100 - p * 100) + "% 0 0)";
 }
 
-async function fetchAsset({ el, url, bytes, img, critical }) {
+async function fetchAsset({ el, url, img }) {
   try {
     const res = await fetch(url);
-    const reader = res.body.getReader();
-    const chunks = [];
-    let got = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      got += value.byteLength;
-      if (critical) { criticalLoaded += value.byteLength; paintProgress(); }
-    }
-    if (critical) criticalLoaded += Math.max(0, bytes - got);
-    const type = img ? "image/jpeg" : "video/mp4";
-    el.src = URL.createObjectURL(new Blob(chunks, { type }));
+    if (!res.ok) throw new Error(res.status);
+    el.src = URL.createObjectURL(await res.blob());
   } catch {
-    el.src = url; // fall back to streaming
-    if (critical) criticalLoaded += bytes;
+    el.src = url; // let the browser stream it on demand
   }
-  if (critical) paintProgress();
-  await new Promise((resolve) => {
-    if (img ? el.complete : el.readyState >= 3) return resolve();
-    const ev = img ? "load" : "canplaythrough";
-    el.addEventListener(ev, resolve, { once: true });
-    el.addEventListener("error", resolve, { once: true });
-    setTimeout(resolve, 6000);
+}
+
+/* Resolves on ready, error, or timeout — never hangs. */
+function waitFor(el, img, ms) {
+  return new Promise((resolve) => {
+    const done = () => { clearTimeout(t); resolve(); };
+    const t = setTimeout(done, ms);
+    if (img ? (el.complete && el.naturalWidth) : el.readyState >= 3) {
+      return done();
+    }
+    el.addEventListener(img ? "load" : "canplaythrough", done, { once: true });
+    el.addEventListener("error", done, { once: true });
   });
 }
 
 async function boot() {
-  /* Critical assets get the full pipe first; the rest stream in
-     behind the intro so they never delay the first frame. */
-  await Promise.all(ASSETS.filter(a => a.critical).map(fetchAsset));
+  stills.hero.src = "assets/hero-hd.jpg";
+  v1.src = "assets/video1.mp4";
+  v1.load();
+
+  /* real buffering progress from the streaming video */
+  (function paintLoop() {
+    if (state !== "loading") return;
+    let p = 0;
+    try {
+      const d = v1.duration, b = v1.buffered;
+      if (d && b.length) p = Math.min(1, b.end(b.length - 1) / d);
+    } catch { /* buffered can be briefly unreadable */ }
+    paintProgress(p);
+    requestAnimationFrame(paintLoop);
+  })();
+
+  await Promise.all([
+    waitFor(v1, false, 8000),
+    waitFor(stills.hero, true, 4000),
+  ]);
+  paintProgress(1);
   startIntro();
-  ASSETS.filter(a => !a.critical).forEach(fetchAsset);
+  PREFETCH.forEach(fetchAsset);
 }
 
 /* ---------------- flow ---------------- */
@@ -173,6 +180,10 @@ function startIntro() {
   layerOn(stills.hero, v1);
   setState("intro");
   playVideo(v1, RATE.v1, () => toHero(false));
+  /* if streaming stalls mid-intro, land on the hero anyway */
+  setTimeout(() => {
+    if (state === "intro") toHero(true);
+  }, 5000);
 }
 
 function toHero(skipped) {
